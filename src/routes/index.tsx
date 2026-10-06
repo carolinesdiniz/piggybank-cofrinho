@@ -61,7 +61,9 @@ function App() {
   const [owned, setOwned] = useState<string[]>([]);
   const xp = 65;
 
-  const complete = () => { if (done) return; setDone(true); setCoins((c) => c + 25); setPop((p) => p + 1); };
+  const [doneTasks, setDoneTasks] = useState<string[]>([]);
+  const finished = [...doneTasks, ...pastTasks];
+  const complete = (name: string, amt: number) => { if (doneTasks.includes(name)) return; setDoneTasks((d) => [name, ...d]); setCoins((c) => c + amt); setPop((p) => p + 1); };
   const buy = (n: string, p: number) => { if (coins < p || owned.includes(n)) return; setCoins((c) => c - p); setOwned((o) => [...o, n]); setPop((x) => x + 1); };
 
   return (
@@ -92,18 +94,29 @@ function App() {
                 <p className="mt-1 text-xs font-bold text-muted-foreground">{xp}/100 moedas até o nível 5</p>
               </section>
 
-              <section className={`rounded-3xl border-4 p-5 shadow-lg transition-colors ${done ? "border-block-green bg-block-green-soft" : "border-block-red bg-card"}`}>
-                <p className="text-xs font-extrabold uppercase tracking-wider text-block-red">⭐ Atividade do dia</p>
-                <div className="mt-2 flex items-center gap-3">
-                  <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-block-red-soft text-block-red"><BookOpen /></div>
-                  <div className="min-w-0">
-                    <h2 className="text-lg font-bold">Ler 10 páginas de um livro</h2>
-                    <p className="text-sm text-muted-foreground">Enviada pela mamãe · +25 moedas</p>
-                  </div>
+              <section>
+                <h2 className="mb-3 text-xl font-bold">Atividades de hoje</h2>
+                <div className="space-y-3">
+                  {tasks.map((t, i) => {
+                    const isDone = doneTasks.includes(t.name);
+                    const red = i === 0;
+                    return (
+                      <div key={t.name} className={`rounded-3xl border-4 p-4 shadow-lg transition-colors ${isDone ? "border-block-green bg-block-green-soft" : red ? "border-block-red bg-card" : "border-block-yellow bg-card"}`}>
+                        {red && <p className="mb-2 text-xs font-extrabold uppercase tracking-wider text-block-red">Destaque do dia</p>}
+                        <div className="flex items-center gap-3">
+                          <div className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl ${red ? "bg-block-red-soft text-block-red" : "bg-block-yellow-soft"}`}><t.icon /></div>
+                          <div className="min-w-0">
+                            <h3 className="text-lg font-bold">{t.name}</h3>
+                            <p className="text-sm text-muted-foreground">Enviada por {t.by} · +{t.coins} moedas</p>
+                          </div>
+                        </div>
+                        <button onClick={() => complete(t.name, t.coins)} disabled={isDone} className={`mt-3 flex w-full items-center justify-center gap-2 rounded-2xl py-3 font-display text-lg font-bold shadow-block press ${isDone ? "bg-block-green text-primary-foreground" : red ? "bg-block-red text-primary-foreground" : "bg-block-yellow"}`}>
+                          {isDone ? <><Check /> Moedas resgatadas!</> : <><Sparkles className="h-5 w-5" /> Concluir Tarefa</>}
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
-                <button onClick={complete} disabled={done} className={`mt-4 flex w-full items-center justify-center gap-2 rounded-2xl py-3.5 font-display text-lg font-bold shadow-block press ${done ? "bg-block-green text-primary-foreground" : "bg-block-red text-primary-foreground"}`}>
-                  {done ? <><Check /> Moedas resgatadas!</> : <><Sparkles className="h-5 w-5" /> Concluir Tarefa</>}
-                </button>
               </section>
 
               <section>
@@ -156,11 +169,23 @@ function App() {
           )}
 
           {tab === "profile" && (
-            <section className="rounded-3xl bg-block-yellow-soft p-6 text-center shadow-lg">
-              <img src={piggy.url} alt="" className="mx-auto h-28 w-28 rounded-3xl object-cover" />
-              <h1 className="mt-3 text-2xl font-bold">Lia, 10 anos</h1>
-              <p className="text-muted-foreground">12 tarefas concluídas · {owned.length} itens</p>
-            </section>
+            <>
+              <section className="rounded-3xl bg-block-yellow-soft p-6 text-center shadow-lg">
+                <img src={piggy.url} alt="" className="mx-auto h-28 w-28 rounded-3xl object-cover" />
+                <h1 className="mt-3 text-2xl font-bold">Lia, 8 anos</h1>
+                <p className="text-muted-foreground">{finished.length} tarefas concluídas · {owned.length} itens</p>
+              </section>
+              <section>
+                <h2 className="mb-3 text-xl font-bold">Tarefas concluídas</h2>
+                <ul className="space-y-2">
+                  {finished.map((t) => (
+                    <li key={t} className="flex items-center gap-3 rounded-2xl bg-card p-3 font-bold shadow-lg">
+                      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-block-green text-primary-foreground"><Check className="h-4 w-4" /></span>{t}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </>
           )}
         </main>
 
@@ -197,6 +222,7 @@ function ParentGate({ onClose }: { onClose: () => void }) {
             <div className="rounded-2xl bg-block-yellow-soft p-4"><p className="flex items-center gap-2 font-bold"><Crown className="h-5 w-5" />Piggy Premium</p><p className="text-sm text-muted-foreground">Desbloqueie itens e metas ilimitadas · R$ 14,90/mês</p></div>
             <button className="w-full rounded-2xl bg-block-red py-3 font-bold text-primary-foreground shadow-block press">Assinar Premium</button>
             <button className="w-full rounded-2xl bg-muted py-3 font-bold">Enviar nova tarefa</button>
+            <PlanBuilder />
           </div>
         )}
       </div>
