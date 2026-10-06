@@ -52,6 +52,15 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
   --color-sidebar: var(--sidebar);
+  --color-block-red: var(--block-red);
+  --color-block-green: var(--block-green);
+  --color-block-yellow: var(--block-yellow);
+  --color-block-red-soft: var(--block-red-soft);
+  --color-block-green-soft: var(--block-green-soft);
+  --color-block-yellow-soft: var(--block-yellow-soft);
+  --color-wood: var(--wood);
+  --font-display: "Fredoka", sans-serif;
+  --font-sans: "Nunito", sans-serif;
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
@@ -62,15 +71,23 @@
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --radius: 1rem;
+  --background: oklch(0.99 0.006 85);
+  --block-red: oklch(0.62 0.21 27);
+  --block-green: oklch(0.58 0.15 155);
+  --block-yellow: oklch(0.85 0.17 90);
+  --block-red-soft: oklch(0.95 0.04 27);
+  --block-green-soft: oklch(0.95 0.05 155);
+  --block-yellow-soft: oklch(0.97 0.06 95);
+  --wood: oklch(0.88 0.05 75);
+  --shadow-block: 0 4px 0 0 oklch(0 0 0 / 0.15);
   --foreground: oklch(0.129 0.042 264.695);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
+  --primary: oklch(0.58 0.15 155);
+  --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.968 0.007 247.896);
   --secondary-foreground: oklch(0.208 0.042 265.755);
   --muted: oklch(0.968 0.007 247.896);
@@ -142,3 +159,11 @@
     color: var(--color-foreground);
   }
 }
+
+@layer base { body { font-family: var(--font-sans); } h1,h2,h3 { font-family: var(--font-display); } }
+@utility shadow-block { box-shadow: var(--shadow-block); }
+@utility press { transition: transform .12s, box-shadow .12s; &:active { transform: translateY(3px); box-shadow: 0 1px 0 0 oklch(0 0 0 / .15); } }
+@keyframes pop { 0%{transform:scale(1)} 40%{transform:scale(1.25) rotate(-6deg)} 100%{transform:scale(1)} }
+@utility animate-pop { animation: pop .5s ease; }
+@keyframes bob { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-6px) rotate(2deg)} }
+@utility animate-bob { animation: bob 3s ease-in-out infinite; }
