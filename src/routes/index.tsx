@@ -22,8 +22,8 @@ type Tab = "home" | "goals" | "shop" | "profile";
 function Block({ letter, color, tilt = 0 }: { letter: string; color: "red" | "green"; tilt?: number }) {
   const c = color === "red" ? "bg-block-red" : "bg-block-green";
   return (
-    <span style={{ transform: `rotate(${tilt}deg)` }} className={`inline-grid h-9 w-9 place-items-center rounded-lg ${c} p-[3px] shadow-block`}>
-      <span className={`grid h-full w-full place-items-center rounded-md bg-wood font-display text-xl font-bold ${color === "red" ? "text-block-red" : "text-block-green"}`}>{letter}</span>
+    <span style={{ transform: `rotate(${tilt}deg)` }} className={`inline-grid h-9 w-9 place-items-center rounded-[6px] ${c} p-[3px] shadow-block`}>
+      <span className={`grid h-full w-full place-items-center rounded-[3px] bg-wood font-display text-xl font-bold ${color === "red" ? "text-block-red" : "text-block-green"}`}>{letter}</span>
     </span>
   );
 }
@@ -84,7 +84,7 @@ function App() {
             <>
               <section className="rounded-3xl bg-block-green-soft p-5 text-center shadow-lg">
                 <img src={piggy.url} alt="Mascote Piggy" className="mx-auto h-36 w-36 animate-bob rounded-3xl object-cover" />
-                <h1 className="mt-3 text-2xl font-bold">Oi, Lia! 👋</h1>
+                <h1 className="mt-3 text-2xl font-bold">Oi, Lia!</h1>
                 <div className="mt-1 inline-flex items-center gap-1 rounded-full bg-background px-3 py-1 text-sm font-bold text-block-green"><Star className="h-4 w-4 fill-current" />Nível 4 · Poupadora</div>
                 <div className="mt-4 h-4 overflow-hidden rounded-full bg-background">
                   <div className="h-full rounded-full bg-block-green transition-all" style={{ width: `${xp}%` }} />
