@@ -4,7 +4,7 @@ import { z } from "zod";
 export const generateSavingsPlan = createServerFn({ method: "POST" })
   .inputValidator(z.object({ goal: z.string().min(3).max(500), age: z.number().int().min(5).max(14) }))
   .handler(async ({ data }) => {
-    const apiKey = process.env.LOVABLE_API_KEY;
+    const apiKey = process.env['LOVABLE_API_KEY'];
     if (!apiKey) return { ok: false as const, error: "Planejador indisponível no momento." };
     const { createOpenAI } = await import("@ai-sdk/openai");
     const { streamText } = await import("ai");
