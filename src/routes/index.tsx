@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Coins, Lock, Home, Target, Store, User, Check, Crown, BookOpen, Gamepad2, PiggyBank, ShoppingBag, X, Star, Sparkles } from "lucide-react";
+import { Coins, Lock, Home, Target, Store, User, Check, Crown, BookOpen, Gamepad2, PiggyBank, ShoppingBag, X, Star, Sparkles, BedDouble, Blocks, Wand2, Loader2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { generateSavingsPlan } from "@/lib/plan.functions";
 import piggy from "@/assets/piggy.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
@@ -43,6 +45,14 @@ const cats = [
   { name: "Gastos", icon: ShoppingBag, val: 30, goal: 50, bar: "bg-block-yellow", soft: "bg-block-yellow-soft" },
 ];
 
+const tasks = [
+  { name: "Ler 10 páginas de um livro", by: "mamãe", coins: 25, icon: BookOpen },
+  { name: "Arrumar a cama", by: "papai", coins: 10, icon: BedDouble },
+  { name: "Guardar os brinquedos", by: "mamãe", coins: 15, icon: Blocks },
+];
+
+const pastTasks = ["Lavar a louça", "Escovar os dentes", "Dar a ração do cachorrinho Snoopy", "Fazer a atividade da escola"];
+
 const items = [
   { name: "Chapéu de Pirata", price: 30, emoji: "🏴‍☠️", premium: false },
   { name: "Óculos Legais", price: 20, emoji: "🕶️", premium: false },
@@ -55,7 +65,6 @@ const items = [
 function App() {
   const [tab, setTab] = useState<Tab>("home");
   const [coins, setCoins] = useState(195);
-  const [done, setDone] = useState(false);
   const [pop, setPop] = useState(0);
   const [parent, setParent] = useState(false);
   const [owned, setOwned] = useState<string[]>([]);
@@ -226,6 +235,34 @@ function ParentGate({ onClose }: { onClose: () => void }) {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function PlanBuilder() {
+  const gen = useServerFn(generateSavingsPlan);
+  const [goal, setGoal] = useState("");
+  const [plan, setPlan] = useState("");
+  const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
+  const run = async () => {
+    if (goal.trim().length < 3 || loading) return;
+    setLoading(true); setErr(""); setPlan("");
+    try {
+      const r = await gen({ data: { goal, age: 8 } });
+      if (r.ok) setPlan(r.plan); else setErr(r.error);
+    } catch { setErr("Não foi possível gerar o plano agora."); }
+    setLoading(false);
+  };
+  return (
+    <div className="rounded-2xl bg-block-green-soft p-4">
+      <p className="flex items-center gap-2 font-bold"><Wand2 className="h-5 w-5" />Plano de poupança com IA</p>
+      <textarea value={goal} onChange={(e) => setGoal(e.target.value)} rows={3} placeholder="Ex.: Lia quer juntar R$ 150 para uma bicicleta até o Natal" className="mt-2 w-full rounded-xl border-2 border-input bg-background p-2 text-sm outline-none focus:border-block-green" />
+      <button onClick={run} disabled={loading} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-block-green py-2.5 font-bold text-primary-foreground shadow-block press">
+        {loading ? <><Loader2 className="h-4 w-4 animate-spin" />Criando plano...</> : "Criar plano"}
+      </button>
+      {err && <p className="mt-2 text-sm font-bold text-destructive">{err}</p>}
+      {plan && <div className="mt-3 max-h-60 overflow-y-auto whitespace-pre-wrap rounded-xl bg-background p-3 text-sm">{plan}</div>}
     </div>
   );
 }
