@@ -1,8 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Coins, Lock, Home, Target, Store, User, Check, Crown, BookOpen, Gamepad2, PiggyBank, ShoppingBag, X, Star, Sparkles, BedDouble, Blocks, Wand2, Loader2 } from "lucide-react";
-import { useServerFn } from "@tanstack/react-start";
-import { generateSavingsPlan } from "@/lib/plan.functions";
+import { Coins, Lock, Home, Target, Store, User, Check, Crown, BookOpen, Gamepad2, PiggyBank, ShoppingBag, Star, Sparkles, BedDouble, Blocks } from "lucide-react";
 import piggy from "@/assets/piggy.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
@@ -66,7 +64,6 @@ function App() {
   const [tab, setTab] = useState<Tab>("home");
   const [coins, setCoins] = useState(195);
   const [pop, setPop] = useState(0);
-  const [parent, setParent] = useState(false);
   const [owned, setOwned] = useState<string[]>([]);
   const xp = 65;
 
@@ -84,9 +81,9 @@ function App() {
             <div key={pop} className="flex animate-pop items-center gap-1.5 rounded-full bg-block-yellow-soft px-3 py-1.5 font-display font-bold">
               <Coins className="h-5 w-5 text-block-yellow" strokeWidth={2.5} />{coins}
             </div>
-            <button aria-label="Acesso Parental" onClick={() => setParent(true)} className="grid h-9 w-9 place-items-center rounded-full bg-muted text-muted-foreground press">
+            <Link to="/parent" aria-label="Acesso Parental" className="grid h-9 w-9 place-items-center rounded-full bg-muted text-muted-foreground press">
               <Lock className="h-4 w-4" />
-            </button>
+            </Link>
           </div>
         </header>
 
@@ -206,63 +203,8 @@ function App() {
           ))}
         </nav>
 
-        {parent && <ParentGate onClose={() => setParent(false)} />}
       </div>
     </div>
   );
 }
 
-function ParentGate({ onClose }: { onClose: () => void }) {
-  const [ans, setAns] = useState("");
-  const [ok, setOk] = useState(false);
-  return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/40 p-6" onClick={onClose}>
-      <div className="w-full max-w-sm rounded-3xl bg-card p-6 shadow-lg" onClick={(e) => e.stopPropagation()}>
-        <div className="flex justify-between"><h2 className="text-xl font-bold">Acesso Parental</h2><button onClick={onClose} aria-label="Fechar"><X /></button></div>
-        {!ok ? (
-          <>
-            <p className="mt-2 text-sm text-muted-foreground">Para continuar, resolva:</p>
-            <p className="my-4 text-center font-display text-4xl font-bold">7 × 8 = ?</p>
-            <input value={ans} onChange={(e) => setAns(e.target.value)} inputMode="numeric" className="w-full rounded-2xl border-2 border-input bg-background p-3 text-center text-2xl font-bold outline-none focus:border-block-green" />
-            <button onClick={() => ans === "56" && setOk(true)} className="mt-4 w-full rounded-2xl bg-block-green py-3 font-bold text-primary-foreground shadow-block press">Entrar</button>
-          </>
-        ) : (
-          <div className="mt-4 space-y-3">
-            <div className="rounded-2xl bg-block-yellow-soft p-4"><p className="flex items-center gap-2 font-bold"><Crown className="h-5 w-5" />Piggy Premium</p><p className="text-sm text-muted-foreground">Desbloqueie itens e metas ilimitadas · R$ 14,90/mês</p></div>
-            <button className="w-full rounded-2xl bg-block-red py-3 font-bold text-primary-foreground shadow-block press">Assinar Premium</button>
-            <button className="w-full rounded-2xl bg-muted py-3 font-bold">Enviar nova tarefa</button>
-            <PlanBuilder />
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function PlanBuilder() {
-  const gen = useServerFn(generateSavingsPlan);
-  const [goal, setGoal] = useState("");
-  const [plan, setPlan] = useState("");
-  const [err, setErr] = useState("");
-  const [loading, setLoading] = useState(false);
-  const run = async () => {
-    if (goal.trim().length < 3 || loading) return;
-    setLoading(true); setErr(""); setPlan("");
-    try {
-      const r = await gen({ data: { goal, age: 8 } });
-      if (r.ok) setPlan(r.plan); else setErr(r.error);
-    } catch { setErr("Não foi possível gerar o plano agora."); }
-    setLoading(false);
-  };
-  return (
-    <div className="rounded-2xl bg-block-green-soft p-4">
-      <p className="flex items-center gap-2 font-bold"><Wand2 className="h-5 w-5" />Plano de poupança com IA</p>
-      <textarea value={goal} onChange={(e) => setGoal(e.target.value)} rows={3} placeholder="Ex.: Lia quer juntar R$ 150 para uma bicicleta até o Natal" className="mt-2 w-full rounded-xl border-2 border-input bg-background p-2 text-sm outline-none focus:border-block-green" />
-      <button onClick={run} disabled={loading} className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-block-green py-2.5 font-bold text-primary-foreground shadow-block press">
-        {loading ? <><Loader2 className="h-4 w-4 animate-spin" />Criando plano...</> : "Criar plano"}
-      </button>
-      {err && <p className="mt-2 text-sm font-bold text-destructive">{err}</p>}
-      {plan && <div className="mt-3 max-h-60 overflow-y-auto whitespace-pre-wrap rounded-xl bg-background p-3 text-sm">{plan}</div>}
-    </div>
-  );
-}
