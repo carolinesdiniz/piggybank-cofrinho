@@ -9,4 +9,3 @@
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
 - AI features run in server functions under src/lib/*.functions.ts via Lovable AI Gateway Responses API; keeps the API key server-side.
-- Parent-only experiences live under the authenticated pathless layout so access control is enforced before rendering.
