@@ -167,3 +167,23 @@
 @utility animate-pop { animation: pop .5s ease; }
 @keyframes bob { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-6px) rotate(2deg)} }
 @utility animate-bob { animation: bob 3s ease-in-out infinite; }
+@keyframes confetti-fall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(180px) rotate(540deg); opacity: 0; }
+}
+@keyframes coin-flight {
+  0% { transform: translate(0, 80px) scale(.7) rotate(0deg); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translate(140px, -140px) scale(.35) rotate(720deg); opacity: 0; }
+}
+.confetti { position: absolute; top: 0; width: 8px; height: 14px; border-radius: 3px; animation: confetti-fall .9s ease-out forwards; }
+.confetti-1 { left: 8%; background: var(--block-red); animation-delay: .02s; }
+.confetti-2 { left: 22%; background: var(--block-yellow); animation-delay: .14s; }
+.confetti-3 { left: 38%; background: var(--block-green); animation-delay: .06s; }
+.confetti-4 { left: 55%; background: var(--block-red); animation-delay: .18s; }
+.confetti-5 { left: 72%; background: var(--block-green); animation-delay: .1s; }
+.confetti-6 { left: 88%; background: var(--block-yellow); animation-delay: .22s; }
+.coin-flight { position: absolute; bottom: 10px; left: 35%; z-index: 2; animation: coin-flight .8s ease-in forwards; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-pop, .animate-bob, .confetti, .coin-flight { animation: none; }
+}
