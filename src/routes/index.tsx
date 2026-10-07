@@ -261,7 +261,7 @@ function App() {
                         <div className={`text-5xl ${item.premium ? "opacity-40 grayscale" : ""}`}>{item.emoji}</div>
                         <p className="mt-2 text-sm font-bold">{item.name}</p>
                         <Button onClick={() => item.premium ? setPremiumOpen(true) : buyOrEquip(item.name, item.price)} disabled={isEquipped} className={`mt-3 h-auto min-h-10 w-full rounded-3xl text-xs font-bold shadow-block press ${item.premium ? "bg-muted text-muted-foreground" : hasItem ? "bg-block-green" : "bg-block-yellow-soft text-foreground"}`}>
-                          {item.premium ? <><Lock />Bloqueado</> : isEquipped ? <><Check />Equipado</> : hasItem ? <><Sparkles />Equipar</> : <><Coins />Comprar · {item.price}</>}
+                          {item.premium ? <><Crown />Premium</> : isEquipped ? <><Check />Equipado</> : hasItem ? <><Sparkles />Equipar</> : <><Coins />Comprar · {item.price}</>}
                         </Button>
                       </div>
                     );
