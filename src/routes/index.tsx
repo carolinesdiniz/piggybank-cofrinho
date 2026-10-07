@@ -1,7 +1,6 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  ArrowLeft,
   BedDouble,
   Blocks,
   BookOpen,
@@ -10,7 +9,6 @@ import {
   Crown,
   Gamepad2,
   Home,
-  Lock,
   PiggyBank,
   ShoppingBag,
   Sparkles,
@@ -106,7 +104,6 @@ function Mascot({ compact = false, accessory }: { compact?: boolean; accessory?:
 }
 
 function App() {
-  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>("home");
   const [coins, setCoins] = useState(195);
   const [pop, setPop] = useState(0);
@@ -117,9 +114,6 @@ function App() {
   const [goals, setGoals] = useState(initialGoals);
   const [celebrating, setCelebrating] = useState<string>();
   const [premiumOpen, setPremiumOpen] = useState(false);
-  const [pinOpen, setPinOpen] = useState(false);
-  const [pin, setPin] = useState("");
-  const [pinError, setPinError] = useState("");
   const xp = 65;
   const equippedItem = items.find((item) => item.name === equipped);
   const finished = [...doneTasks, ...pastTasks];
@@ -173,28 +167,13 @@ function App() {
     setPop((current) => current + 1);
   };
 
-  const enterPin = (digit: string) => {
-    setPinError("");
-    setPin((current) => current.length < 4 ? current + digit : current);
-  };
-
-  const confirmPin = async () => {
-    if (pin !== "1234") {
-      setPinError("PIN incorreto. Tente novamente.");
-      setPin("");
-      return;
-    }
-    setPinOpen(false);
-    await navigate({ to: "/parent" });
-  };
-
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-muted/40">
         <div className="relative mx-auto min-h-screen max-w-md bg-background pb-32">
           <header className="sticky top-0 z-20 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 bg-background/90 px-5 py-4 backdrop-blur">
             <Logo />
-            <div className="flex items-center gap-2">
+            <div>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div key={pop} className="animate-pop rounded-2xl bg-block-yellow-soft px-3 py-1.5 text-center font-display font-bold" aria-label={`${coins} Moedas Piggy, equivalente a R$ ${(coins / 10).toFixed(2).replace(".", ",")}`}>
@@ -204,7 +183,6 @@ function App() {
                 </TooltipTrigger>
                 <TooltipContent>Moedas Piggy</TooltipContent>
               </Tooltip>
-              <Button aria-label="Acesso Parental" variant="ghost" size="icon" onClick={() => setPinOpen(true)} className="rounded-full bg-muted text-muted-foreground press"><Lock /></Button>
             </div>
           </header>
 
@@ -234,7 +212,7 @@ function App() {
                             <div className="min-w-0"><h3 className="text-lg font-bold">{task.name}</h3><p className="text-sm text-muted-foreground">Enviada por {task.by} · +{task.coins} moedas</p></div>
                           </div>
                           <Button onClick={() => complete(task.name, task.coins)} disabled={isDone} className={`mt-3 h-auto min-h-12 w-full rounded-3xl py-3 font-display text-base font-bold shadow-block press ${isDone ? "bg-block-green" : index === 0 ? "bg-block-red" : "bg-block-yellow text-foreground"}`}>
-                            {isDone ? <><Check />Aguardando confirmação dos pais</> : <><Sparkles />Concluir Tarefa</>}
+                            {isDone ? <><Check />Concluída! ✨</> : <><Sparkles />Concluir Tarefa</>}
                           </Button>
                           {isDone && <p className="mt-3 rounded-2xl bg-background/80 p-3 text-center text-xs font-bold text-muted-foreground">Moedas divididas entre seus cofrinhos: 50% Poupança, 30% Jogos, 20% Gastos Livres!</p>}
                         </div>
@@ -308,19 +286,8 @@ function App() {
 
           <Dialog open={premiumOpen} onOpenChange={setPremiumOpen}>
             <DialogContent className="w-[calc(100%-2rem)] rounded-3xl border-0 bg-block-yellow-soft text-center shadow-lg">
-              <div className="mx-auto text-6xl">🌟</div><DialogHeader className="text-center"><DialogTitle className="font-display text-2xl">Item exclusivo do Piggy Club!</DialogTitle><DialogDescription className="text-base">Peça para um responsável desbloquear a assinatura na área dos pais.</DialogDescription></DialogHeader>
-              <Button onClick={() => { setPremiumOpen(false); setPinOpen(true); }} className="rounded-3xl font-bold"><Lock />Chamar papai/mamãe</Button><Button variant="ghost" onClick={() => setPremiumOpen(false)} className="rounded-3xl">Voltar</Button>
-            </DialogContent>
-          </Dialog>
-
-          <Dialog open={pinOpen} onOpenChange={(open) => { setPinOpen(open); if (!open) { setPin(""); setPinError(""); } }}>
-            <DialogContent className="w-[calc(100%-2rem)] max-w-sm rounded-3xl shadow-lg">
-              <DialogHeader className="text-center"><div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-block-green text-primary-foreground"><Lock /></div><DialogTitle className="font-display text-2xl">Acesso Parental</DialogTitle><DialogDescription>Digite o PIN de 4 dígitos para continuar.</DialogDescription></DialogHeader>
-              <div className="flex justify-center gap-3" aria-label={`${pin.length} de 4 dígitos preenchidos`}>{[0, 1, 2, 3].map((slot) => <span key={slot} className={`h-4 w-4 rounded-full border-2 border-block-green ${pin.length > slot ? "bg-block-green" : "bg-background"}`} />)}</div>
-              <div className="grid grid-cols-3 gap-3">{["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((digit) => <Button key={digit} variant="secondary" onClick={() => enterPin(digit)} className="h-14 rounded-3xl font-display text-xl font-bold">{digit}</Button>)}<Button variant="ghost" onClick={() => setPin((current) => current.slice(0, -1))} className="h-14 rounded-3xl" aria-label="Apagar"><ArrowLeft /></Button><Button variant="secondary" onClick={() => enterPin("0")} className="h-14 rounded-3xl font-display text-xl font-bold">0</Button><Button onClick={confirmPin} disabled={pin.length !== 4} className="h-14 rounded-3xl" aria-label="Confirmar PIN"><Check /></Button></div>
-              {pinError && <p role="alert" className="text-center text-sm font-bold text-destructive">{pinError}</p>}
-              <Button variant="link" onClick={() => navigate({ to: "/auth" })} className="w-full">Esqueci meu PIN / Pergunta de segurança</Button>
-              <p className="text-center text-xs text-muted-foreground">Para demonstração, use 1234.</p>
+              <div className="mx-auto text-6xl">🌟</div><DialogHeader className="text-center"><DialogTitle className="font-display text-2xl">Item exclusivo do Piggy Club!</DialogTitle><DialogDescription className="text-base">Este item Premium estará disponível em breve.</DialogDescription></DialogHeader>
+              <Button onClick={() => setPremiumOpen(false)} className="rounded-3xl font-bold">Voltar para a lojinha</Button>
             </DialogContent>
           </Dialog>
         </div>
