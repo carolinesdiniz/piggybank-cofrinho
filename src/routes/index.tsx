@@ -96,7 +96,7 @@ const initialGoals: Goal[] = [
   { name: "Presente pro vovô 🎁", val: 30, goal: 40, bar: "bg-block-yellow" },
 ];
 
-function Mascot({ compact = false, accessory }: { compact?: boolean; accessory?: string }) {
+function Mascot({ compact = false, accessory }: { compact?: boolean; accessory?: string | undefined }) {
   return (
     <div className={`relative mx-auto ${compact ? "h-28 w-28" : "h-36 w-36 animate-bob"}`}>
       <img src={piggy.url} alt="Mascote Piggy" className="h-full w-full rounded-3xl object-cover" />
@@ -145,7 +145,8 @@ function App() {
     const games = Math.round(amount * 0.3);
     const spending = amount - saving - games;
     setDoneTasks((current) => [name, ...current]);
-    setWallets((current) => current.map((wallet, index) => ({ ...wallet, val: wallet.val + [saving, games, spending][index] })));
+    const shares = [saving, games, spending];
+    setWallets((current) => current.map((wallet, index) => ({ ...wallet, val: wallet.val + (shares[index] ?? 0) })));
     setCoins((current) => current + amount);
     setCelebrating(name);
     setPop((current) => current + 1);
