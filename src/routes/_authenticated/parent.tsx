@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { ArrowLeft, Crown, Loader2, LogOut, ShieldCheck, Wand2 } from "lucide-react";
+import { ArrowLeft, Check, Crown, ListChecks, Loader2, LogOut, Plus, ShieldCheck, Wand2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +31,11 @@ function ParentArea() {
   const [plan, setPlan] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingTasks, setPendingTasks] = useState([
+    "Ler 10 páginas de um livro",
+    "Arrumar a cama",
+    "Guardar os brinquedos",
+  ]);
 
   const createPlan = async () => {
     if (goal.trim().length < 3 || loading) return;
@@ -69,7 +74,24 @@ function ParentArea() {
           <p className="mt-2 text-sm text-muted-foreground">Você entrou com {user.email}.</p>
         </section>
 
-        <section className="mt-7 rounded-2xl border border-border bg-card p-5 shadow-lg sm:p-7">
+        <section className="mt-7 rounded-3xl border border-border bg-card p-5 shadow-lg sm:p-7">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="flex items-center gap-2 font-display text-xl font-bold"><ListChecks className="text-block-green" />Tarefas pendentes</h2>
+            <span className="rounded-full bg-block-yellow-soft px-3 py-1 text-xs font-bold">{pendingTasks.length} para aprovar</span>
+          </div>
+          <div className="mt-4 space-y-3">
+            {pendingTasks.length === 0 && <p className="rounded-2xl bg-block-green-soft p-4 text-sm font-bold text-block-green">Tudo validado por aqui!</p>}
+            {pendingTasks.map((task) => (
+              <div key={task} className="flex items-center gap-3 rounded-3xl bg-muted/60 p-3">
+                <p className="min-w-0 flex-1 text-sm font-bold">{task}</p>
+                <Button onClick={() => setPendingTasks((current) => current.filter((item) => item !== task))} className="shrink-0 rounded-3xl font-bold"><Check />Validar</Button>
+              </div>
+            ))}
+          </div>
+          <Button variant="outline" className="mt-4 w-full rounded-3xl font-bold"><Plus />Criar nova tarefa</Button>
+        </section>
+
+        <section className="mt-5 rounded-3xl border border-border bg-card p-5 shadow-lg sm:p-7">
           <h2 className="flex items-center gap-2 font-display text-xl font-bold"><Wand2 className="text-block-green" />Plano de poupança com IA</h2>
           <p className="mt-2 text-sm text-muted-foreground">Descreva a meta da Lia e receba sugestões de tarefas e contribuições adequadas para 8 anos.</p>
           <Textarea value={goal} onChange={(event) => setGoal(event.target.value)} rows={4} placeholder="Ex.: Lia quer juntar R$ 150 para uma bicicleta até o Natal" className="mt-5 resize-none" />
@@ -80,10 +102,11 @@ function ParentArea() {
           {plan && <div className="mt-5 whitespace-pre-wrap rounded-xl bg-block-green-soft p-4 text-sm leading-relaxed">{plan}</div>}
         </section>
 
-        <section className="mt-5 flex items-start gap-3 rounded-2xl bg-block-yellow-soft p-5">
+        <section className="mt-5 flex items-start gap-3 rounded-3xl bg-block-yellow-soft p-5 shadow-lg">
           <Crown className="mt-0.5 h-5 w-5 shrink-0" />
           <div><h2 className="font-bold">Piggy Premium</h2><p className="text-sm text-muted-foreground">Itens exclusivos e metas ilimitadas · R$ 14,90/mês</p></div>
         </section>
+        <Button variant="secondary" onClick={() => navigate({ to: "/" })} className="mt-5 h-12 w-full rounded-3xl font-bold"><ArrowLeft />Voltar para o modo criança</Button>
       </div>
     </main>
   );
